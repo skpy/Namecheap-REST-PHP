@@ -6,10 +6,10 @@ This is a simple single-file class for accessing the Namecheap REST API.
 
 Methods are loosely named after the corresponding API endpoint.
 
-namecheap.domains.check         == domainCheck()
-namecheap.domains.create        == domainCreate()
+namecheap.domains.check         == domainsCheck()
+namecheap.domains.create        == domainsCreate()
 namecheap.domains.ns.create     == nsCreate()
-namecheap.domains.dns.setCustom == nsSet()
+namecheap.domains.dns.setCustom == dnsSetCustom()
 
 The class fully supports the Namecheap Sandbox (https://www.sandbox.namecheap.com) during object construction.
 
@@ -23,11 +23,11 @@ $nc_api = array( 'api_user' => 'username',
 	);
 $sandbox = 'true'; // use the Namecheap sandbox to test
 $nc = new Namecheap( $nc_api, $sandbox );
-if ( $nc->domainCheck( 'example.com' ) ) {
+if ( $nc->domainsCheck( 'example.com' ) ) {
 	echo "<p>example.com is available!</p>";
 }
 $domains = array( 'example.net', 'example.org', 'example.info' );
-$results = $nc->domainCheck( $domains );
+$results = $nc->domainsCheck( $domains );
 echo "<ul>";
 foreach ( $results as $domain => $available ) {
 	$status = ( $available ) ? 'available' : 'not available';

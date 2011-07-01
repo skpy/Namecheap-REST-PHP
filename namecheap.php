@@ -95,7 +95,7 @@ class namecheap
 	 * @return mixed  associative array of domains => status, 
 	 *	or boolean if only a single domain is being checked
 	 */
-	public function domainCheck( $domains )
+	public function domainsCheck( $domains )
 	{
 		if ( is_array( $domains ) ) {
 			$domains = implode( ',', $domains );
@@ -126,7 +126,7 @@ class namecheap
 	 *	http://developer.namecheap.com/docs/doku.php?id=api-reference:domains:create
 	 * @return bool success or failure of the registration
 	 */
-	public function domainCreate( $domain, $data )
+	public function domainsCreate( $domain, $data )
 	{
 		$data['DomainName'] = $domain;
 		if ( ! $this->execute( 'namecheap.domains.create', $data ) ) {
@@ -148,7 +148,7 @@ class namecheap
 	 * @search string specific name for which to search
 	 * @return mixed an array of domains or boolean false
 	 */
-	public function domainsList( $type = 'all', $page = 1, $pagesize = 100,  $sort = 'NAME', $search = '')
+	public function domainsGetList( $type = 'all', $page = 1, $pagesize = 100,  $sort = 'NAME', $search = '')
 	{
 		if ( ! $this->execute( 'namecheap.domains.getList', array( 'ListType' => $type, 'SearchTerm' => $search, 'Page' => $page, 'PageSize' => $pagesize, 'SortBy' => $sort ) ) ) {
 			return FALSE;
@@ -190,7 +190,7 @@ class namecheap
 	 * @nameservers mixed an array or comma delimited list of nameservers
 	 * @return bool success or failure
 	 */
-	public function nsSet( $domain, $nameservers )
+	public function dnsSetCustom( $domain, $nameservers )
 	{
 		if ( is_array( $nameservers ) ) {
 			$nameservers = implode( ',', $nameservers );
@@ -210,11 +210,28 @@ class namecheap
 	}
 
 	/*
+	 * configure a domain to use Namecheap's default nameservers
+	 * @domain string the domain to set
+	 * @return bool success or failure
+	 */
+	public function dnsSetDefault( $domain )
+	{
+		list( $sld, $tld ) = explode( '.', $domain );
+		if ( ! $this->execute( 'namecheap.domains.dns.SetDefault', array( 'SLD' => $sld, 'TLD' => $tld ) ) ) {
+			return FALSE;
+		}
+		if ( 'true' == strtolower( $this->Response->DomainDNSSetDefaultResult->attributes()->Updated ) ) {
+			return TRUE;
+		}
+		return FALSE;
+	}
+
+	/*
 	 * get a list of DNS servers for a domain
 	 * @domain string the domain to query
 	 * @return mixed an array of nameservers, or boolean false
 	 */
-	public function dnsList( $domain )
+	public function dnsGetList( $domain )
 	{
 		list( $sld, $tld ) = explode( '.', $domain );
 		if ( ! $this->execute( 'namecheap.domains.dns.getList', array( 'SLD' => $sld, 'TLD' => $tld ) ) ) {
@@ -228,10 +245,28 @@ class namecheap
 	}
 
 	/*
+	 * set DNS host records for the specified domain
+	 * @domain string domain for which the record should be defined
+	 * @data array associative array of record details to set
+	 * @return bool success or failure
+	 */
+	public function dnsSetHosts( $domain, $data )
+	{
+		list( $data['SLD'], $data['TLD'] ) = explode( '.', $domain );
+		if ( ! $this->execute( 'namecheap.domains.dns.setHosts', $data ) ) {
+			return FALSE;
+		}
+		if ( 'true' == strtolower( $this->Response->DomainDNSSetHostsResult->attributes()->IsSuccess ) ) {
+			return TRUE;
+		}
+		return FALSE;
+	}
+
+	/*
 	 * return the balance of an account
 	 * @return mixed an array of balance information, or boolean false
 	 */
-	public function getBalances()
+	public function usersGetBalances()
 	{
 		if( ! $this->execute( 'namecheap.users.getBalances' ) ) {
 			return FALSE;
