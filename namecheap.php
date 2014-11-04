@@ -39,7 +39,7 @@ class namecheap
 	{
 		$ch = curl_init( 'http://icanhazip.com' );
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, TRUE );
-		$result = curl_exec( $ch );
+		$result = rtrim(curl_exec( $ch ) );
 		curl_close( $ch );
 		return $result;
 	}
